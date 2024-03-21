@@ -6,6 +6,7 @@ import (
 	"NetManager/logger"
 	"NetManager/mqtt"
 	"NetManager/network"
+	"NetManager/networkFunctionManager"
 	"NetManager/playground"
 	"NetManager/proxy"
 	"encoding/json"
@@ -131,6 +132,8 @@ func register(writer http.ResponseWriter, request *http.Request) {
 	Proxy.SetEnvironment(&Env)
 
 	writer.WriteHeader(http.StatusOK)
+
+	var nfm = networkFunctionManager.New()
 }
 
 func main() {
