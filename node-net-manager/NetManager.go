@@ -134,6 +134,7 @@ func register(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusOK)
 
 	var nfm = networkFunctionManager.New()
+	nfm.NewPacketCounter()
 }
 
 func main() {

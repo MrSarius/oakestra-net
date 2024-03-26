@@ -1,5 +1,10 @@
 package networkFunctionManager
 
+import (
+	"NetManager/networkFunctionManager/ebpfNetworkFunctions"
+	"NetManager/networkFunctionManager/ebpfNetworkFunctions/packetCounter"
+)
+
 type NetworkFunctionManager struct {
 	functions []NetworkFunction
 }
@@ -8,24 +13,11 @@ func New() *NetworkFunctionManager {
 	return &NetworkFunctionManager{}
 }
 
-func (m *NetworkFunctionManager) AddFunction(fn NetworkFunction) {
-	m.functions = append(m.functions, fn)
-}
-
-func (m *NetworkFunctionManager) AttachFunctions(interfaceName string) error {
-	for _, fn := range m.functions {
-		if err := fn.Attach(interfaceName); err != nil {
-			return err
-		}
+// AttachNewPacketCounter this function is just here for prototyping
+func (e *NetworkFunctionManager) NewPacketCounter() error {
+	counter := packetCounter.PacketCounter{
+		EBPFNetworkFunction: ebpfNetworkFunctions.EBPFNetworkFunction{},
 	}
-	return nil
-}
-
-func (m *NetworkFunctionManager) DetachFunctions() error {
-	for _, fn := range m.functions {
-		if err := fn.Detach(); err != nil {
-			return err
-		}
-	}
+	counter.LoadAndAttach()
 	return nil
 }
