@@ -10,15 +10,14 @@ import (
 )
 
 type EBPFNetworkFunction struct {
-	ID          string        // Unique identifier
-	Description string        // Description of what the function does
-	Program     *ebpf.Program // ebpf Program pointer
-	Link        link.Link
-	Attached    bool // if the Program is currently Attached to the interface
+	Program  *ebpf.Program // ebpf Program pointer
+	Link     link.Link
+	Attached bool // if the Program is currently Attached to the interface
 }
 
 // Attach attaches the eBPF program to the specified network interface.
 func (e *EBPFNetworkFunction) Attach() error {
+	// Remove resource limits for kernels <5.11.
 	if err := rlimit.RemoveMemlock(); err != nil {
 		log.Fatal("Removing memlock:", err)
 	}

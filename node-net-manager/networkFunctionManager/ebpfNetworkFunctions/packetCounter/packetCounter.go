@@ -16,17 +16,10 @@ type PacketCounter struct {
 // Attach attaches the eBPF program to the specified network interface.
 func (e *PacketCounter) LoadAndAttach() error {
 
-	/*
-		// Remove resource limits for kernels <5.11.
-		if err := rlimit.RemoveMemlock(); err != nil {
-			log.Fatal("Removing memlock:", err)
-		}
-	*/
-
 	// Load the compiled eBPF ELF and load it into the kernel.
 	var objs packetCounterObjects
 	if err := loadPacketCounterObjects(&objs, nil); err != nil {
-		log.Fatal("Loadinsg eBPF objects:", err)
+		log.Fatal("Loading eBPF objects:", err)
 	}
 	defer objs.Close()
 

@@ -13,6 +13,12 @@ func New() *NetworkFunctionManager {
 	return &NetworkFunctionManager{}
 }
 
+func (e *NetworkFunctionManager) DetachAll() {
+	for _, nf := range e.functions {
+		nf.Detach()
+	}
+}
+
 // AttachNewPacketCounter this function is just here for prototyping
 func (e *NetworkFunctionManager) NewPacketCounter() error {
 	counter := packetCounter.PacketCounter{

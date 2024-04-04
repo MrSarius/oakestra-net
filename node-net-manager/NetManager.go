@@ -111,7 +111,7 @@ func register(writer http.ResponseWriter, request *http.Request) {
 			log.Printf("Node already initialized")
 			writer.WriteHeader(http.StatusOK)
 		} else {
-			log.Printf("Attempting to re-initialize a node with a different worker ID")
+			log.Printf("Attempting to re-initialize a dnode with a different worker ID")
 			writer.WriteHeader(http.StatusBadRequest)
 		}
 		return
@@ -125,16 +125,17 @@ func register(writer http.ResponseWriter, request *http.Request) {
 	//initialize the proxy tunnel
 	Proxy = proxy.New()
 	Proxy.Listen()
+	Proxy.GetName()
 
 	//initialize the Env Manager
 	Env = *env.NewEnvironmentClusterConfigured(Proxy.HostTUNDeviceName)
 
 	Proxy.SetEnvironment(&Env)
 
-	writer.WriteHeader(http.StatusOK)
-
 	var nfm = networkFunctionManager.New()
 	nfm.NewPacketCounter()
+
+	writer.WriteHeader(http.StatusOK)
 }
 
 func main() {
