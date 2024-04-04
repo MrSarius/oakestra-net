@@ -13,6 +13,12 @@ type PacketCounter struct {
 	pktCount *ebpf.Map
 }
 
+func New() PacketCounter {
+	return PacketCounter{
+		EBPFNetworkFunction: ebpfNetworkFunctions.EBPFNetworkFunction{},
+	}
+}
+
 // Attach attaches the eBPF program to the specified network interface.
 func (e *PacketCounter) LoadAndAttach() error {
 
@@ -32,5 +38,3 @@ func (e *PacketCounter) LoadAndAttach() error {
 
 	return nil
 }
-
-// Idea for the control plane: Configure an FD where the amount of packets is written.

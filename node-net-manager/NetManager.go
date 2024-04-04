@@ -7,6 +7,7 @@ import (
 	"NetManager/mqtt"
 	"NetManager/network"
 	"NetManager/networkFunctionManager"
+	"NetManager/networkFunctionManager/ebpfNetworkFunctions/simpleFirewall"
 	"NetManager/playground"
 	"NetManager/proxy"
 	"encoding/json"
@@ -132,8 +133,9 @@ func register(writer http.ResponseWriter, request *http.Request) {
 
 	Proxy.SetEnvironment(&Env)
 
-	var nfm = networkFunctionManager.New()
-	nfm.NewPacketCounter()
+	nfm := networkFunctionManager.New()
+	sfw := simpleFirewall.New()
+	nfm.AttachNetworkFunction(&sfw) // TODO why & here?
 
 	writer.WriteHeader(http.StatusOK)
 }

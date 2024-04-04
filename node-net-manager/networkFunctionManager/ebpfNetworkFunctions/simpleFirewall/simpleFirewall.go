@@ -14,9 +14,10 @@ import (
 type SimpleFirewall struct {
 	ebpfNetworkFunctions.EBPFNetworkFunction
 	allowedPorts *ebpf.Map
+	nextProg     *ebpf.Map
 }
 
-type Allow int
+type Allow uint8
 
 const (
 	// AllowTCP allows only TCP traffic.
@@ -28,8 +29,25 @@ const (
 	AllowBoth
 )
 
+func New() SimpleFirewall {
+	return SimpleFirewall{
+		EBPFNetworkFunction: ebpfNetworkFunctions.EBPFNetworkFunction{},
+	}
+}
+
+func (e *SimpleFirewall) Chain(fn ebpfNetworkFunctions.EBPFNetworkFunction) {
+	// TODO can chained function already be attached? Initial though would be
+	if !e.EBPFNetworkFunction.Attached || e.nextProg == nil || fn.Attached {
+		return // TODO error
+	}
+	// TODO handle the case if value is already set! Is this actually allowed? -> For now its fine...
+	if err := e.nextProg.Update(0, uint32(e.Program.FD()), ebpf.UpdateAny); err != nil {
+		log.Fatalf("Failed to insert program FD into prog_array map: %v", err)
+	}
+}
+
 func (e *SimpleFirewall) AddFirewallRule(allow Allow, port uint16) {
-	err := e.allowedPorts.Update(port, &simpleFirewallPortProtocol{Port: port, Protocol: uint8(allow)}, ebpf.UpdateAny)
+	err := e.allowedPorts.Update(port, allow, ebpf.UpdateAny)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to update map: %v\n", err)
 		os.Exit(1)
@@ -47,10 +65,9 @@ func (e *SimpleFirewall) LoadAndAttach() error {
 
 	e.Program = objs.SimpleFirewall
 	e.allowedPorts = objs.AllowedPorts
+	e.allowedPorts = objs.AllowedPorts
 
 	e.EBPFNetworkFunction.Attach()
-
-	//log.Printf("Counting incoming packets on %s..", "eth0")
 
 	return nil
 }
